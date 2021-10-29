@@ -1,0 +1,28 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GLDraw : MonoBehaviour
+{
+    public Material mat;
+
+    void OnPostRender()
+    {
+        BarBottom();
+    }
+    void BarBottom()
+    {
+        GL.pushMatrix();
+        mat.setPass(0);
+        GL.begin(GLDraw.QUADS);
+        GL.Color(Color.green);
+
+        GL.Vertex3(0,0,0);
+        GL.Vertex3(0,1,0);
+        GL.Vertex3(1,1,0);
+        GL.Vertex3(1,0,0);
+
+        GL.End();
+        GL.PopMatrix();
+    }
+}
