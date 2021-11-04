@@ -1,12 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class SnakeGame : MonoBehaviour
 {
     public Material mat;
     public Vector2 sb;
     bool startGame = false;
+    float by = 0;
+    float bx = 0;
+    float velo = 0.02f;
+    bool invert;
+    public int life = 3;
+    public int score = 0;
+
+
 
     #region Unity Methods
 
@@ -22,6 +32,27 @@ public class SnakeGame : MonoBehaviour
 
         sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
 
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            bx -= velo;
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            bx += velo;
+        }
+        if (Input.GetKey(KeyCode.UpArrow))
+        {
+            by += velo;
+        }
+        if (Input.GetKey(KeyCode.DownArrow))
+        {
+            by -= velo;
+        }
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            by = 0;
+        }
+        Collision();
 
     }
     private void OnPostRender()
@@ -120,6 +151,7 @@ public class SnakeGame : MonoBehaviour
         GL.PopMatrix();
     }
 
+
     void Snake()
     {
         GL.PushMatrix();
@@ -161,45 +193,45 @@ public class SnakeGame : MonoBehaviour
     {
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
-        GL.Vertex3(0, 0, 0);
-        GL.Vertex3(0, 0.5f, 0);
-        GL.Vertex3(0.5f, 0.5f, 0);
-        GL.Vertex3(0.5f, 0, 0);
+        GL.Vertex3(bx, by, 0);
+        GL.Vertex3(bx, by + 0.5f, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
+        GL.Vertex3(bx + 0.5f, by, 0);
 
-        GL.Vertex3(0.5f, 0, 0);
-        GL.Vertex3(1, 0, 0);
-        GL.Vertex3(0.5f, 0.5f, 0);
-        GL.Vertex3(1, 0.5f, 0);
+        GL.Vertex3(bx + 0.5f, by, 0);
+        GL.Vertex3(bx + 1, by, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
+        GL.Vertex3(bx + 1, by + 0.5f, 0);
 
         GL.End();
         Eyes();
         Tongue();
 
-        
+
     }
     void Eyes() {
         GL.Begin(GL.QUADS);
         GL.Color(Color.white);
-        GL.Vertex3(0.2f, 0.4f, 0);
-        GL.Vertex3(0.2f, 0.3f, 0);
-        GL.Vertex3(0.5f, 0.3f, 0);
-        GL.Vertex3(0.5f, 0.4f, 0);
+        GL.Vertex3(bx + 0.2f, by + 0.4f, 0);
+        GL.Vertex3(bx + 0.2f, by + 0.3f, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.3f, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.4f, 0);
 
-        GL.Vertex3(0.2f, 0.1f, 0);
-        GL.Vertex3(0.2f, 0.2f, 0);
-        GL.Vertex3(0.5f, 0.2f, 0);
-        GL.Vertex3(0.5f, 0.1f, 0);
+        GL.Vertex3(bx + 0.2f, by + 0.1f, 0);
+        GL.Vertex3(bx + 0.2f, by + 0.2f, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.2f, 0);
+        GL.Vertex3(bx + 0.5f, by + 0.1f, 0);
 
         GL.Color(Color.red);
-        GL.Vertex3(0.3f, 0.4f, 0);
-        GL.Vertex3(0.3f, 0.3f, 0);
-        GL.Vertex3(0.35f, 0.3f, 0);
-        GL.Vertex3(0.35f, 0.4f, 0);
+        GL.Vertex3(bx + 0.3f, by + 0.4f, 0);
+        GL.Vertex3(bx + 0.3f, by + 0.3f, 0);
+        GL.Vertex3(bx + 0.35f, by + 0.3f, 0);
+        GL.Vertex3(bx + 0.35f, by + 0.4f, 0);
 
-        GL.Vertex3(0.3f, 0.1f, 0);
-        GL.Vertex3(0.3f, 0.2f, 0);
-        GL.Vertex3(0.35f, 0.2f, 0);
-        GL.Vertex3(0.35f, 0.1f, 0);
+        GL.Vertex3(bx + 0.3f, by + 0.1f, 0);
+        GL.Vertex3(bx + 0.3f, by + 0.2f, 0);
+        GL.Vertex3(bx + 0.35f, by + 0.2f, 0);
+        GL.Vertex3(bx + 0.35f, by + 0.1f, 0);
 
 
         GL.End();
@@ -207,14 +239,14 @@ public class SnakeGame : MonoBehaviour
     void Tongue() {
         GL.Begin(GL.LINES);
         GL.Color(Color.red);
-        GL.Vertex(new Vector3(0.8f, 0.25f, 0));
-        GL.Vertex(new Vector3(1.1f, 0.25f, 0));
+        GL.Vertex(new Vector3(bx + 0.8f, by + 0.25f, 0));
+        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
 
-        GL.Vertex(new Vector3(1.1f, 0.25f, 0));
-        GL.Vertex(new Vector3(1.5f, 0.5f, 0));
+        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
+        GL.Vertex(new Vector3(bx + 1.5f, by + 0.5f, 0));
 
-        GL.Vertex(new Vector3(1.1f, 0.25f, 0));
-        GL.Vertex(new Vector3(1.5f, 0, 0));
+        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
+        GL.Vertex(new Vector3(bx + 1.5f, by, 0));
         GL.End();
     }
     public void end()
@@ -228,5 +260,22 @@ public class SnakeGame : MonoBehaviour
         GL.End();
     }
 
+    void Collision()
+    {
+        if ((by + 1) >= (sb.y-1) || (by - 1) <= (-sb.y))
+        {
+            life--;
+            by = 0;
+            bx = 0;
+        }
+        if ((bx + 1) >= (sb.x - 1) || (bx - 1) <= (-sb.x + 1))
+        {
+            life--;
+            bx = 0;
+            by = 0;
+
+        }
+
+    }
     #endregion
 }
