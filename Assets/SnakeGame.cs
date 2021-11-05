@@ -14,7 +14,7 @@ public class SnakeGame : MonoBehaviour
     float velo = 0.02f;
     public int life = 3;
     public int score = 0;
-    public char move;
+    public char move = 'n';
     public bool rotate = false;
     public float mGR = 2;
     public float mGL = -2;
@@ -25,7 +25,7 @@ public class SnakeGame : MonoBehaviour
     private void Start()
     {
         sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-
+        move = 'n';
     }
 
 
@@ -166,7 +166,18 @@ public class SnakeGame : MonoBehaviour
         GL.PushMatrix();
         mat.SetPass(0);
 
-        headRight();
+        Debug.Log(move);
+        if (move == 'n')
+            headRight();
+        if (move == 'u')
+            headUp();            
+        if (move == 'd')
+            headDown();
+        if (move == 'l')
+            headLeft();
+        if (move == 'r')
+            headRight();
+            
         end();
 
         /*GL.Begin(GL.QUADS);
@@ -199,6 +210,7 @@ public class SnakeGame : MonoBehaviour
 
     public void headRight()
     {
+        Debug.Log("RIGHT");
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
         GL.Vertex3(bx, by, 0);
@@ -256,6 +268,7 @@ public class SnakeGame : MonoBehaviour
 
     public void headLeft()
     {
+        Debug.Log("LEFT");
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
         GL.Vertex3(bx, by, 0);
@@ -314,6 +327,7 @@ public class SnakeGame : MonoBehaviour
 
    public  void headUp()
     {
+        Debug.Log("UP");
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
         GL.Vertex3(bx, by, 0);
@@ -368,7 +382,7 @@ public class SnakeGame : MonoBehaviour
 
     public void headDown()
     {
-
+        Debug.Log("DOWN");
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
         GL.Vertex3(bx, by, 0);
@@ -471,7 +485,6 @@ public class SnakeGame : MonoBehaviour
 
      void rotation(char direction)
     {
-        
         if (direction == 'u' && rotate)
         {
             rotate = false;
