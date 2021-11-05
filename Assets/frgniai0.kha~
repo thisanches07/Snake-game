@@ -14,8 +14,9 @@ public class SnakeGame : MonoBehaviour
     float velo = 0.02f;
     public int life = 3;
     public int score = 0;
+    bool shoot = false;
     public char move;
-    public bool rotate = false;
+
     public float mGR = 2;
     public float mGL = -2;
 
@@ -166,7 +167,7 @@ public class SnakeGame : MonoBehaviour
         GL.PushMatrix();
         mat.SetPass(0);
 
-        headRight();
+        head4();
         end();
 
         /*GL.Begin(GL.QUADS);
@@ -190,11 +191,11 @@ public class SnakeGame : MonoBehaviour
         GL.Vertex3(-1.5f, 0, 0);
         GL.Vertex3(-1.5f, 0.5f, 0);
         GL.Vertex3(-2, 0.5f, 0);
-        GL.Vertex3(-2, 0, 0);*/
+        GL.Vertex3(-2, 0, 0);
 
         GL.End();
 
-        GL.PopMatrix();
+        GL.PopMatrix();*/
     }
 
     public void headRight()
@@ -312,8 +313,9 @@ public class SnakeGame : MonoBehaviour
 
     }
 
-   public  void headUp()
+    void headUp()
     {
+        
         GL.Begin(GL.QUADS);
         GL.Color(Color.green);
         GL.Vertex3(bx, by, 0);
@@ -366,7 +368,7 @@ public class SnakeGame : MonoBehaviour
         GL.End();
     }
 
-    public void headDown()
+    void headDown()
     {
 
         GL.Begin(GL.QUADS);
@@ -422,7 +424,6 @@ public class SnakeGame : MonoBehaviour
 
 
     }
-    
     public void end()
     {
         GL.Begin(GL.QUADS);
@@ -440,57 +441,38 @@ public class SnakeGame : MonoBehaviour
         if(move=='l')
         {
             //rotacionar
-            rotate = true;
-            rotation('l');
+        
             bx -= velo;
         }
         if (move=='r')
         {
             //rotacionar
-            rotate = true;
-            rotation('r');
+           
             bx += velo;
         }
         if (move=='u')
         {
             //rotacionar
-            rotate = true;
-            rotation('u');
+            
             by += velo;
         }
         if (move=='d')
         {
             //rotacionar
-            rotate = true;
-            rotation('d');
+            
             by -= velo;
         }
 
         
     }
 
-     void rotation(char direction)
+    void rotation(char direction)
     {
-        
-        if (direction == 'u' && rotate)
+        if (direction == 'u')
         {
-            rotate = false;
-            headUp();            
-        }
-        if (direction == 'd' && rotate)
-        {
-            rotate = false;
-            headDown();
-        }
-        if (direction == 'l' && rotate)
-        {
-            rotate = false;
-            headLeft();
-        }
-        if (direction == 'r' && rotate)
-        {
-            rotate = false;
-            headRight();
+            bx -= 0.5f;
+            by += 0.5f;
+            headUp();
         }
     }
     void Collision()
