@@ -178,7 +178,6 @@ public class SnakeGame : MonoBehaviour
             headLeft();
         if (move == 'r')
             headRight();
-
         end();
 
         /*GL.Begin(GL.QUADS);
