@@ -1,523 +1,287 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using System;
 
-
-public class SnakeGame : MonoBehaviour
+public class GL_Draw : MonoBehaviour
 {
-    public Material mat;
-    public Vector2 sb;
-    bool startGame = false;
-    float by = 0;
-    float bx = 0;
-    float velo = 0.02f;
-    public int life = 3;
-    public int score = 0;
-    public char move = 'n';
-    public bool rotate = false;
-    public float mGR = 2;
-    public float mGL = -2;
+    public Material material;
+    public int numBlock = 2;
+    public float velocidade = 0.1f;
+    private float xAux = 0;
+    private float yAux = 0;
+    private char direcao = 'D';
+    private bool free = false;
+    private bool play = true;
+    protected Snake snake = new Snake();
 
 
-    #region Unity Methods
-
-    private void Start()
+    // Start is called before the first frame update
+    void Start()
     {
-        sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        move = 'n';
+        snake = new Snake();
     }
 
-
-    private void Update()
+    // Update is called once per frame
+    void Update()
     {
 
-        sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+        // Logica para setar a posição
+        if (Input.GetKey(KeyCode.LeftArrow) && direcao != 'D' && free)
+        {
+            direcao = 'E';
+            free = false;
+        }
+        if (Input.GetKey(KeyCode.RightArrow) && direcao != 'E' && free)
+        {
+            direcao = 'D';
+            free = false;
+        }
+        if (Input.GetKey(KeyCode.DownArrow) && direcao != 'C' && free)
+        {
+            direcao = 'B';
+            free = false;
+        }
+        if (Input.GetKey(KeyCode.UpArrow) && direcao != 'B' && free)
+        {
+            direcao = 'C';
+            free = false;
+        }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        // Logica dos passos
+        if (direcao == 'E' && play)
         {
-            move = 'l';
+            xAux = xAux - velocidade;
         }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
+
+        if (direcao == 'D' && play)
         {
-            move = 'r';
+            xAux = xAux + velocidade;
         }
-        if (Input.GetKeyDown(KeyCode.UpArrow))
+
+        if (direcao == 'B' && play)
         {
-            rotation('u');
-            move = 'u';
+            yAux = yAux - velocidade;
         }
-        if (Input.GetKeyDown(KeyCode.DownArrow))
+
+        if (direcao == 'C' && play)
         {
-            move = 'd';
+            yAux = yAux + velocidade;
         }
+
+        // Logica Atualiza a direção dos blocos
+        if (xAux >= 1)
+        {
+            xAux = 0;
+            snake.update('D');
+            free = true;
+            play = snake.checkCrash();
+        }
+
+        if (xAux <= -1)
+        {
+            xAux = 0;
+            snake.update('E');
+            free = true;
+            play = snake.checkCrash();
+        }
+
+        if (yAux >= 1)
+        {
+            yAux = 0;
+            snake.update('C');
+            free = true;
+            play = snake.checkCrash();
+        }
+
+        if (yAux <= -1)
+        {
+            yAux = 0;
+            snake.update('B');
+            free = true;
+            play = snake.checkCrash();
+        }
+
+        // recomeçar
         if (Input.GetKey(KeyCode.Escape))
         {
-            move = 'z';
-            by = 0;
-            bx = 0;
+            direcao = 'D';
+            snake = new Snake(-10.0f, 0.0f);
+            play = true;
         }
 
-        Move();
-        Collision();
-
     }
+
     private void OnPostRender()
     {
-        if (startGame)
-        {
-            Arena();
-            Snake();
-        }
-    }
-    #endregion
-
-
-    #region My Methods
-
-    public void StartGame()
-    {
-        startGame = true;
+        Body();
     }
 
-    void Arena()
-    {
-        BarBottom();
-        BarLeft();
-        BarRight();
-        BarTop();
-    }
-
-    void BarTop()
-    {
-
-        GL.PushMatrix();
-        mat.SetPass(0);
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.black);
-
-        GL.Vertex3(sb.x * (-1), sb.y, 0);
-        GL.Vertex3(sb.x * (-1), sb.y - 1, 0);
-        GL.Vertex3(0, sb.y - 1, 0);
-        GL.Vertex3(0, sb.y, 0);
-
-
-
-        GL.Vertex3(0, sb.y, 0);
-        GL.Vertex3(0, sb.y - 1, 0);
-        GL.Vertex3(sb.x, sb.y - 1, 0);
-        GL.Vertex3(sb.x, sb.y, 0);
-
-        GL.End();
-        GL.PopMatrix();
-    }
-
-    void BarBottom()
+    void Body()
     {
         GL.PushMatrix();
-        mat.SetPass(0);
+        material.SetPass(0);
         GL.Begin(GL.QUADS);
-        GL.Color(Color.black);
+        GL.Color(Color.green);
 
-        GL.Vertex3(sb.x * (-1), sb.y * (-1), 0);
-        GL.Vertex3(sb.x * (-1), 1 + sb.y * (-1), 0);
-        GL.Vertex3(sb.x, 1 + sb.y * (-1), 0);
-        GL.Vertex3(sb.x, sb.y * (-1), 0);
+        snake.drawBox();
 
-        GL.End();
-        GL.PopMatrix();
-    }
-
-    void BarLeft()
-    {
-        GL.PushMatrix();
-        mat.SetPass(0);
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.black);
-
-        GL.Vertex3(sb.x * (-1), sb.y * (-1), 0);
-        GL.Vertex3(sb.x * (-1), sb.y, 0);
-        GL.Vertex3(sb.x * (-1) + 1, sb.y, 0);
-        GL.Vertex3(sb.x * (-1) + 1, sb.y * (-1), 0);
-
-        GL.End();
-        GL.PopMatrix();
-    }
-
-    void BarRight()
-    {
-        GL.PushMatrix();
-        mat.SetPass(0);
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.black);
-
-        GL.Vertex3(sb.x, sb.y * (-1), 0);
-        GL.Vertex3(sb.x, sb.y, 0);
-        GL.Vertex3(sb.x - 1, sb.y, 0);
-        GL.Vertex3(sb.x - 1, sb.y * (-1), 0);
 
         GL.End();
         GL.PopMatrix();
     }
 
 
-    void Snake()
+
+    public class Snake
     {
+        private List<Block> blocks = new List<Block>();
+        private Block randomBlock = new Block(0.0f, 0.0f, 'C');
 
-        GL.PushMatrix();
-        mat.SetPass(0);
-
-        Debug.Log(move);
-        if (move == 'n')
-            headRight();
-        if (move == 'u')
-            headUp();
-        if (move == 'd')
-            headDown();
-        if (move == 'l')
-            headLeft();
-        if (move == 'r')
-            headRight();
-        end();
-
-        /*GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex3(0, 0, 0);
-        GL.Vertex3(0, 0.5f, 0);
-        GL.Vertex3(-0.5f, 0.5f, 0);
-        GL.Vertex3(-0.5f, 0, 0);
-        GL.Vertex3(-0.5f, 0, 0);
-        GL.Vertex3(-0.5f, 0.5f, 0);
-        GL.Vertex3(-1, 0.5f, 0);
-        GL.Vertex3(-1, 0, 0);
-        GL.Vertex3(-1, 0, 0);
-        GL.Vertex3(-1, 0.5f, 0);
-        GL.Vertex3(-1.5f, 0.5f, 0);
-        GL.Vertex3(-1.5f, 0, 0);
-        GL.Vertex3(-1.5f, 0, 0);
-        GL.Vertex3(-1.5f, 0.5f, 0);
-        GL.Vertex3(-2, 0.5f, 0);
-        GL.Vertex3(-2, 0, 0);*/
-
-        GL.End();
-
-        GL.PopMatrix();
-    }
-
-    public void headRight()
-    {
-        Debug.Log("RIGHT");
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex3(bx, by, 0);
-        GL.Vertex3(bx, by + 0.5f, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx + 0.5f, by, 0);
-
-        GL.Vertex3(bx + 0.5f, by, 0);
-        GL.Vertex3(bx + 1, by, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx + 1, by + 0.5f, 0);
-
-        GL.End();
-        //Eyes
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.white);
-        GL.Vertex3(bx + 0.2f, by + 0.4f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.4f, 0);
-
-        GL.Vertex3(bx + 0.2f, by + 0.1f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.1f, 0);
-
-        GL.Color(Color.red);
-        GL.Vertex3(bx + 0.3f, by + 0.4f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.35f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.35f, by + 0.4f, 0);
-
-        GL.Vertex3(bx + 0.3f, by + 0.1f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.35f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.35f, by + 0.1f, 0);
-        GL.End();
-
-        //Tongue
-        GL.Begin(GL.LINES);
-        GL.Color(Color.red);
-        GL.Vertex(new Vector3(bx + 0.8f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
-
-        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx + 1.5f, by + 0.5f, 0));
-
-        GL.Vertex(new Vector3(bx + 1.1f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx + 1.5f, by, 0));
-        GL.End();
-
-
-    }
-
-
-    public void headLeft()
-    {
-        Debug.Log("LEFT");
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex3(bx, by, 0);
-        GL.Vertex3(bx, by + 0.5f, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx - 0.5f, by, 0);
-
-        GL.Vertex3(bx - 0.5f, by, 0);
-        GL.Vertex3(bx - 1, by, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx - 1, by + 0.5f, 0);
-
-        GL.End();
-        //eyes
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.white);
-        GL.Vertex3(bx - 0.2f, by + 0.4f, 0);
-        GL.Vertex3(bx - 0.2f, by + 0.3f, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.3f, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.4f, 0);
-
-        GL.Vertex3(bx - 0.2f, by + 0.1f, 0);
-        GL.Vertex3(bx - 0.2f, by + 0.2f, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.2f, 0);
-        GL.Vertex3(bx - 0.5f, by + 0.1f, 0);
-
-        GL.Color(Color.red);
-        GL.Vertex3(bx - 0.3f, by + 0.4f, 0);
-        GL.Vertex3(bx - 0.3f, by + 0.3f, 0);
-        GL.Vertex3(bx - 0.35f, by + 0.3f, 0);
-        GL.Vertex3(bx - 0.35f, by + 0.4f, 0);
-
-        GL.Vertex3(bx - 0.3f, by + 0.1f, 0);
-        GL.Vertex3(bx - 0.3f, by + 0.2f, 0);
-        GL.Vertex3(bx - 0.35f, by + 0.2f, 0);
-        GL.Vertex3(bx - 0.35f, by + 0.1f, 0);
-
-
-        GL.End();
-
-        //Tongue
-        GL.Begin(GL.LINES);
-        GL.Color(Color.red);
-        GL.Vertex(new Vector3(bx - 0.8f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx - 1.1f, by + 0.25f, 0));
-
-        GL.Vertex(new Vector3(bx - 1.1f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx - 1.5f, by + 0.5f, 0));
-
-        GL.Vertex(new Vector3(bx - 1.1f, by + 0.25f, 0));
-        GL.Vertex(new Vector3(bx - 1.5f, by, 0));
-        GL.End();
-
-
-    }
-
-    public void headUp()
-    {
-        Debug.Log("UP");
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex3(bx, by, 0);
-        GL.Vertex3(bx + 0.5f, by, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx, by + 0.5f, 0);
-
-        GL.Vertex3(bx, by + 0.5f, 0);
-        GL.Vertex3(bx, by + 1, 0);
-        GL.Vertex3(bx + 0.5f, by + 0.5f, 0);
-        GL.Vertex3(bx + 0.5f, by + 1, 0);
-
-        GL.End();
-        //Eyes
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.white);
-        GL.Vertex3(bx + 0.4f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.5f, 0);
-        GL.Vertex3(bx + 0.4f, by + 0.5f, 0);
-
-        GL.Vertex3(bx + 0.1f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.2f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.5f, 0);
-        GL.Vertex3(bx + 0.1f, by + 0.5f, 0);
-
-        GL.Color(Color.red);
-        GL.Vertex3(bx + 0.4f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.3f, by + 0.35f, 0);
-        GL.Vertex3(bx + 0.4f, by + 0.35f, 0);
-
-        GL.Vertex3(bx + 0.1f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.3f, 0);
-        GL.Vertex3(bx + 0.2f, by + 0.35f, 0);
-        GL.Vertex3(bx + 0.1f, by + 0.35f, 0);
-        GL.End();
-
-        //Tongue
-        GL.Begin(GL.LINES);
-        GL.Color(Color.red);
-        GL.Vertex(new Vector3(bx + 0.25f, by + 0.8f, 0));
-        GL.Vertex(new Vector3(bx + 0.25f, by + 1.1f, 0));
-
-        GL.Vertex(new Vector3(bx + 0.25f, by + 1.1f, 0));
-        GL.Vertex(new Vector3(bx + 0.5f, by + 1.5f, 0));
-
-        GL.Vertex(new Vector3(bx + 0.25f, by + 1.1f, 0));
-        GL.Vertex(new Vector3(bx, by + 1.5f, 0));
-        GL.End();
-    }
-
-    public void headDown()
-    {
-        Debug.Log("DOWN");
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex3(bx, by, 0);
-        GL.Vertex3(bx + 0.5f, by, 0);
-        GL.Vertex3(bx + 0.5f, by - 0.5f, 0);
-        GL.Vertex3(bx, by - 0.5f, 0);
-
-        GL.Vertex3(bx, by - 0.5f, 0);
-        GL.Vertex3(bx, by - 1, 0);
-        GL.Vertex3(bx + 0.5f, by - 0.5f, 0);
-        GL.Vertex3(bx + 0.5f, by - 1, 0);
-
-        GL.End();
-        //Eyes
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.white);
-        GL.Vertex3(bx + 0.4f, by - 0.2f, 0);
-        GL.Vertex3(bx + 0.3f, by - 0.2f, 0);
-        GL.Vertex3(bx + 0.3f, by - 0.5f, 0);
-        GL.Vertex3(bx + 0.4f, by - 0.5f, 0);
-
-        GL.Vertex3(bx + 0.1f, by - 0.2f, 0);
-        GL.Vertex3(bx + 0.2f, by - 0.2f, 0);
-        GL.Vertex3(bx + 0.2f, by - 0.5f, 0);
-        GL.Vertex3(bx + 0.1f, by - 0.5f, 0);
-
-        GL.Color(Color.red);
-        GL.Vertex3(bx + 0.4f, by - 0.3f, 0);
-        GL.Vertex3(bx + 0.3f, by - 0.3f, 0);
-        GL.Vertex3(bx + 0.3f, by - 0.35f, 0);
-        GL.Vertex3(bx + 0.4f, by - 0.35f, 0);
-
-        GL.Vertex3(bx + 0.1f, by - 0.3f, 0);
-        GL.Vertex3(bx + 0.2f, by - 0.3f, 0);
-        GL.Vertex3(bx + 0.2f, by - 0.35f, 0);
-        GL.Vertex3(bx + 0.1f, by - 0.35f, 0);
-        GL.End();
-
-        //Tongue
-        GL.Begin(GL.LINES);
-        GL.Color(Color.red);
-        GL.Vertex(new Vector3(bx + 0.25f, by - 0.8f, 0));
-        GL.Vertex(new Vector3(bx + 0.25f, by - 1.1f, 0));
-
-        GL.Vertex(new Vector3(bx + 0.25f, by - 1.1f, 0));
-        GL.Vertex(new Vector3(bx + 0.5f, by - 1.5f, 0));
-
-        GL.Vertex(new Vector3(bx + 0.25f, by - 1.1f, 0));
-        GL.Vertex(new Vector3(bx, by - 1.5f, 0));
-        GL.End();
-
-
-    }
-
-    public void end()
-    {
-        GL.Begin(GL.QUADS);
-        GL.Color(Color.green);
-        GL.Vertex(new Vector3(-2, 0, 0));
-        GL.Vertex(new Vector3(-2.5f, 0.25f, 0));
-        GL.Vertex(new Vector3(-2.5f, 0.25f, 0));
-        GL.Vertex(new Vector3(-2, 0.5f, 0));
-        GL.End();
-    }
-
-    void Move()
-    {
-
-        if (move == 'l')
+        public Snake()
         {
-            //rotacionar
-            rotate = true;
-            rotation('l');
-            bx -= velo;
-        }
-        if (move == 'r')
-        {
-            //rotacionar
-            rotate = true;
-            rotation('r');
-            bx += velo;
-        }
-        if (move == 'u')
-        {
-            //rotacionar
-            rotate = true;
-            rotation('u');
-            by += velo;
-        }
-        if (move == 'd')
-        {
-            //rotacionar
-            rotate = true;
-            rotation('d');
-            by -= velo;
+            blocks.Add(new Block(0, 0, 'D'));
+            addBlock();
+            addBlock();
+            addBlock();
+            createRandomBlock();
         }
 
+        public Snake(float x, float y)
+        {
+            blocks.Add(new Block(x, y, 'D'));
+            addBlock();
+            addBlock();
+            addBlock();
+            createRandomBlock();
+        }
 
-    }
+        public void update(char direction)
+        {
 
-    void rotation(char direction)
-    {
-        if (direction == 'u' && rotate)
-        {
-            rotate = false;
-            headUp();
+            float nextX = 0;
+            float nextY = 0;
+
+            for (int i = 0; i <= blocks.Count - 1; i++)
+            {
+                if (i == 0)
+                {
+                    nextX = blocks[i].posicaoX;
+                    nextY = blocks[i].posicaoY;
+
+                    if (direction == 'D') blocks[i].posicaoX = blocks[i].posicaoX + 1.0f;
+                    else if (direction == 'E') blocks[i].posicaoX = blocks[i].posicaoX - 1.0f;
+                    else if (direction == 'C') blocks[i].posicaoY = blocks[i].posicaoY + 1.0f;
+                    else blocks[i].posicaoY = blocks[i].posicaoY - 1.0f;
+                }
+                else
+                {
+                    float x = blocks[i].posicaoX;
+                    float y = blocks[i].posicaoY;
+
+                    blocks[i].posicaoX = nextX;
+                    blocks[i].posicaoY = nextY;
+
+                    nextX = x;
+                    nextY = y;
+                }
+            }
+
+            this.checkBlock();
         }
-        if (direction == 'd' && rotate)
+
+        public void checkBlock()
         {
-            rotate = false;
-            headDown();
+            if (blocks[0].posicaoX == randomBlock.posicaoX && blocks[0].posicaoY == randomBlock.posicaoY)
+            {
+                this.addBlock();
+                this.createRandomBlock();
+            }
         }
-        if (direction == 'l' && rotate)
+
+        public bool checkCrash()
         {
-            rotate = false;
-            headLeft();
+            for (int i = 1; i <= blocks.Count - 1; i++)
+            {
+                if (blocks[0].posicaoX == blocks[i].posicaoX && blocks[0].posicaoY == blocks[i].posicaoY) return false;
+            }
+
+            return true;
         }
-        if (direction == 'r' && rotate)
+
+        public void drawBox()
         {
-            rotate = false;
-            headRight();
+            bool first = true;
+            foreach (Block block in blocks)
+            {
+                float x = block.posicaoX;
+                float y = block.posicaoY;
+
+                if (first) GL.Color(Color.red);
+                else GL.Color(Color.green);
+
+                GL.Vertex3(x, y, 0);
+                GL.Vertex3(x, y + 1, 0);
+                GL.Vertex3(x + 1, y + 1, 0);
+                GL.Vertex3(x + 1, y, 0);
+                first = false;
+            }
+
+            GL.Color(Color.blue);
+            GL.Vertex3(randomBlock.posicaoX, randomBlock.posicaoY, 0);
+            GL.Vertex3(randomBlock.posicaoX, randomBlock.posicaoY + 1, 0);
+            GL.Vertex3(randomBlock.posicaoX + 1, randomBlock.posicaoY + 1, 0);
+            GL.Vertex3(randomBlock.posicaoX + 1, randomBlock.posicaoY, 0);
         }
-    }
-    void Collision()
-    {
-        if ((by + 1) >= (sb.y - 1) || (by - 1) <= (-sb.y))
+
+        public void createRandomBlock()
         {
-            life--;
-            by = 0;
-            bx = 0;
+            System.Random rnd = new System.Random();
+
+            bool valid = true;
+
+            do
+            {
+                valid = true;
+
+                randomBlock.posicaoX = rnd.Next(-12, 12);
+                randomBlock.posicaoY = rnd.Next(-5, 5);
+
+                for (int i = 0; i <= blocks.Count - 1; i++)
+                {
+                    if (blocks[i].posicaoX == randomBlock.posicaoX && blocks[i].posicaoY == randomBlock.posicaoY) valid = false;
+                }
+
+            } while (valid == false);
+
         }
-        if ((bx + 1) >= (sb.x - 1) || (bx - 1) <= (-sb.x + 1))
+
+        public void addBlock()
         {
-            life--;
-            bx = 0;
-            by = 0;
+            Block block = blocks[blocks.Count - 1];
+
+            if (block.direcao == 'D') blocks.Add(new Block(block.posicaoX - 1.0f, block.posicaoY, 'D'));
+            else if (block.direcao == 'E') blocks.Add(new Block(block.posicaoX + 1.0f, block.posicaoY, 'E'));
+            else if (block.direcao == 'C') blocks.Add(new Block(block.posicaoX, block.posicaoY - 1.0f, 'C'));
+            else blocks.Add(new Block(block.posicaoX, block.posicaoY + 1.0f, 'B'));
 
         }
 
     }
-    #endregion
+
+    class Block
+    {
+        public float posicaoX { get; set; }
+        public float posicaoY { get; set; }
+        public char direcao { get; set; }
+
+        public Block(float posicaoX, float posicaoY, char direcao)
+        {
+            this.posicaoX = posicaoX;
+            this.posicaoY = posicaoY;
+            this.direcao = direcao;
+        }
+    }
+
+
 }
