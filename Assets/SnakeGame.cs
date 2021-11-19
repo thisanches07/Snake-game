@@ -2,10 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
-public class GL_Draw : MonoBehaviour
+public class SnakeGame : MonoBehaviour
 {
+    [SerializeField] private GameObject pnl_GameOver;
+    [SerializeField] private GameObject pnl_Score;
+
     public Material material;
+    public Vector2 sb;
     public int numBlock = 2;
     public float velocidade = 0.1f;
     private float xAux = 0;
@@ -14,106 +20,165 @@ public class GL_Draw : MonoBehaviour
     private bool free = false;
     private bool play = true;
     protected Snake snake = new Snake();
+    private bool timer = false;
+    public Text ts;
+    public Text ts2;
 
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
+        
         snake = new Snake();
+        ts.text = snake.score.ToString();
+        ts2.text = snake.score.ToString();
+        sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+
+    }
+
+    public void Reset(){
+        numBlock = 2;
+        velocidade = 0.1f;
+        xAux = 0;
+        yAux = 0;
+        direcao = 'D';
+        free = false;
+        play = true;
+        snake = null;
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        // Logica para setar a posição
-        if (Input.GetKey(KeyCode.LeftArrow) && direcao != 'D' && free)
+        sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
+
+        if(!timer)
         {
-            direcao = 'E';
-            free = false;
-        }
-        if (Input.GetKey(KeyCode.RightArrow) && direcao != 'E' && free)
-        {
-            direcao = 'D';
-            free = false;
-        }
-        if (Input.GetKey(KeyCode.DownArrow) && direcao != 'C' && free)
-        {
-            direcao = 'B';
-            free = false;
-        }
-        if (Input.GetKey(KeyCode.UpArrow) && direcao != 'B' && free)
-        {
-            direcao = 'C';
-            free = false;
+            
+            StartCoroutine(CountDown(0.05f));
+
+
+            // Logica para setar a posiï¿½ï¿½o
+            if (Input.GetKey(KeyCode.LeftArrow) && direcao != 'D' && free)
+            {
+                direcao = 'E';
+                free = false;
+            }
+            if (Input.GetKey(KeyCode.RightArrow) && direcao != 'E' && free)
+            {
+                direcao = 'D';
+                free = false;
+            }
+            if (Input.GetKey(KeyCode.DownArrow) && direcao != 'C' && free)
+            {
+                direcao = 'B';
+                free = false;
+            }
+            if (Input.GetKey(KeyCode.UpArrow) && direcao != 'B' && free)
+            {
+                direcao = 'C';
+                free = false;
+            }
+
+            // Logica dos passos
+            if (direcao == 'E' && play)
+            {
+                xAux = xAux - velocidade;
+            }
+
+            if (direcao == 'D' && play)
+            {
+                xAux = xAux + velocidade;
+            }
+
+            if (direcao == 'B' && play)
+            {
+                yAux = yAux - velocidade;
+            }
+
+            if (direcao == 'C' && play)
+            {
+                yAux = yAux + velocidade;
+            }
+
+            // Logica Atualiza a direï¿½ï¿½o dos blocos
+            if (xAux >= 1)
+            {
+                xAux = 0;
+                snake.update('D');
+                free = true;
+                play = snake.checkCrash();
+            }
+
+            if (xAux <= -1)
+            {
+                xAux = 0;
+                snake.update('E');
+                free = true;
+                play = snake.checkCrash();
+            }
+
+            if (yAux >= 1)
+            {
+                yAux = 0;
+                snake.update('C');
+                free = true;
+                play = snake.checkCrash();
+            }
+
+            if (yAux <= -1)
+            {
+                yAux = 0;
+                snake.update('B');
+                free = true;
+                play = snake.checkCrash();
+            }
+
+            if(!play){
+                StartCoroutine(GameOverSequence());
+            }
+
+            // recomeï¿½ar
+            if (Input.GetKey(KeyCode.Escape))
+            {
+                direcao = 'D';
+                snake = new Snake(-10.0f, 0.0f);
+                play = true;
+            }
+
         }
 
-        // Logica dos passos
-        if (direcao == 'E' && play)
-        {
-            xAux = xAux - velocidade;
-        }
+        
 
-        if (direcao == 'D' && play)
-        {
-            xAux = xAux + velocidade;
-        }
+        ts.text = snake.score.ToString();
+        ts2.text = snake.score.ToString();
 
-        if (direcao == 'B' && play)
-        {
-            yAux = yAux - velocidade;
-        }
+    }
 
-        if (direcao == 'C' && play)
-        {
-            yAux = yAux + velocidade;
-        }
+    private IEnumerator GameOverSequence()
+    {
+        pnl_GameOver.SetActive(true);
 
-        // Logica Atualiza a direção dos blocos
-        if (xAux >= 1)
-        {
-            xAux = 0;
-            snake.update('D');
-            free = true;
-            play = snake.checkCrash();
-        }
+        pnl_Score.SetActive(false);
 
-        if (xAux <= -1)
-        {
-            xAux = 0;
-            snake.update('E');
-            free = true;
-            play = snake.checkCrash();
-        }
+        yield return new WaitForSeconds(1.0f);
+        
+    }
 
-        if (yAux >= 1)
-        {
-            yAux = 0;
-            snake.update('C');
-            free = true;
-            play = snake.checkCrash();
-        }
-
-        if (yAux <= -1)
-        {
-            yAux = 0;
-            snake.update('B');
-            free = true;
-            play = snake.checkCrash();
-        }
-
-        // recomeçar
-        if (Input.GetKey(KeyCode.Escape))
-        {
-            direcao = 'D';
-            snake = new Snake(-10.0f, 0.0f);
-            play = true;
-        }
-
+    IEnumerator CountDown(float delay)
+    {
+        timer = true;
+        yield return new WaitForSeconds(delay);
+        timer= false;
     }
 
     private void OnPostRender()
     {
+        BarTop();
+        BarBottom();
+        BarLeft();
+        BarRight();
         Body();
     }
 
@@ -131,12 +196,82 @@ public class GL_Draw : MonoBehaviour
         GL.PopMatrix();
     }
 
+    void BarTop()
+    {
+
+        GL.PushMatrix();
+        material.SetPass(0);
+        GL.Begin(GL.QUADS);
+        GL.Color(Color.black);
+
+        GL.Vertex3(sb.x * (-1), sb.y, 0);
+        GL.Vertex3(sb.x * (-1), sb.y - 1, 0);
+        GL.Vertex3(0, sb.y - 1, 0);
+        GL.Vertex3(0, sb.y, 0);
+
+
+
+        GL.Vertex3(0, sb.y, 0);
+        GL.Vertex3(0, sb.y - 1, 0);
+        GL.Vertex3(sb.x, sb.y - 1, 0);
+        GL.Vertex3(sb.x, sb.y, 0);
+
+        GL.End();
+        GL.PopMatrix();
+    }
+    void BarBottom()
+    {
+        GL.PushMatrix();
+        material.SetPass(0);
+        GL.Begin(GL.QUADS);
+        GL.Color(Color.black);
+
+        GL.Vertex3(sb.x * (-1), sb.y * (-1), 0);
+        GL.Vertex3(sb.x * (-1), 1 + sb.y * (-1), 0);
+        GL.Vertex3(sb.x, 1 + sb.y * (-1), 0);
+        GL.Vertex3(sb.x, sb.y * (-1), 0);
+
+        GL.End();
+        GL.PopMatrix();
+    }
+    void BarLeft()
+    {
+        GL.PushMatrix();
+        material.SetPass(0);
+        GL.Begin(GL.QUADS);
+        GL.Color(Color.black);
+
+        GL.Vertex3(sb.x * (-1), sb.y * (-1), 0);
+        GL.Vertex3(sb.x * (-1), sb.y, 0);
+        GL.Vertex3(sb.x * (-1) + 1, sb.y, 0);
+        GL.Vertex3(sb.x * (-1) + 1, sb.y * (-1), 0);
+
+        GL.End();
+        GL.PopMatrix();
+    }
+    void BarRight()
+    {
+        GL.PushMatrix();
+        material.SetPass(0);
+        GL.Begin(GL.QUADS);
+        GL.Color(Color.black);
+
+        GL.Vertex3(sb.x, sb.y * (-1), 0);
+        GL.Vertex3(sb.x, sb.y, 0);
+        GL.Vertex3(sb.x - 1, sb.y, 0);
+        GL.Vertex3(sb.x - 1, sb.y * (-1), 0);
+
+        GL.End();
+        GL.PopMatrix();
+    }
+
 
 
     public class Snake
     {
         private List<Block> blocks = new List<Block>();
         private Block randomBlock = new Block(0.0f, 0.0f, 'C');
+        public int score = 0;
 
         public Snake()
         {
@@ -196,6 +331,7 @@ public class GL_Draw : MonoBehaviour
             {
                 this.addBlock();
                 this.createRandomBlock();
+                this.score++;
             }
         }
 
