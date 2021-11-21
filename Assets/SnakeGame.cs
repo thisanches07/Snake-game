@@ -19,6 +19,7 @@ public class SnakeGame : MonoBehaviour
     private char direcao = 'D';
     private bool free = false;
     private bool play = true;
+    public bool crashArena= false;
     protected Snake snake = new Snake();
     private bool timer = false;
     public Text ts;
@@ -134,8 +135,8 @@ public class SnakeGame : MonoBehaviour
                 free = true;
                 play = snake.checkCrash();
             }
-
-            if(!play){
+            crashArena = snake.checkCrashWithArena(sb);
+            if(!play || crashArena){
                 StartCoroutine(GameOverSequence());
             }
 
@@ -341,8 +342,13 @@ public class SnakeGame : MonoBehaviour
             {
                 if (blocks[0].posicaoX == blocks[i].posicaoX && blocks[0].posicaoY == blocks[i].posicaoY) return false;
             }
-
             return true;
+        }
+
+        public bool checkCrashWithArena(Vector2 sb)
+        {
+            if(blocks[0].posicaoX <= ((sb.x*(-1))+1) || blocks[0].posicaoX >= (sb.x-1) || blocks[0].posicaoY <= ((sb.y*(-1))) || blocks[0].posicaoY >= (sb.y-1)) return true;
+            return false;
         }
 
         public void drawBox()
@@ -373,8 +379,9 @@ public class SnakeGame : MonoBehaviour
         public void createRandomBlock()
         {
             System.Random rnd = new System.Random();
-
+            
             bool valid = true;
+
 
             do
             {
