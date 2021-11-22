@@ -205,15 +205,15 @@ public class SnakeGame : MonoBehaviour
         GL.Begin(GL.QUADS);
         GL.Color(Color.black);
 
+        //GL.Vertex3(sb.x * (-1), sb.y, 0);
+        //GL.Vertex3(sb.x * (-1), sb.y - 1, 0);
+        //GL.Vertex3(0, sb.y - 1, 0);
+        //GL.Vertex3(0, sb.y, 0);
+
+
+
         GL.Vertex3(sb.x * (-1), sb.y, 0);
         GL.Vertex3(sb.x * (-1), sb.y - 1, 0);
-        GL.Vertex3(0, sb.y - 1, 0);
-        GL.Vertex3(0, sb.y, 0);
-
-
-
-        GL.Vertex3(0, sb.y, 0);
-        GL.Vertex3(0, sb.y - 1, 0);
         GL.Vertex3(sb.x, sb.y - 1, 0);
         GL.Vertex3(sb.x, sb.y, 0);
 
@@ -244,8 +244,8 @@ public class SnakeGame : MonoBehaviour
 
         GL.Vertex3(sb.x * (-1), sb.y * (-1), 0);
         GL.Vertex3(sb.x * (-1), sb.y, 0);
-        GL.Vertex3(sb.x * (-1) + 1, sb.y, 0);
-        GL.Vertex3(sb.x * (-1) + 1, sb.y * (-1), 0);
+        GL.Vertex3(-8, sb.y, 0);
+        GL.Vertex3(-8, sb.y * (-1), 0);
 
         GL.End();
         GL.PopMatrix();
@@ -259,8 +259,8 @@ public class SnakeGame : MonoBehaviour
 
         GL.Vertex3(sb.x, sb.y * (-1), 0);
         GL.Vertex3(sb.x, sb.y, 0);
-        GL.Vertex3(sb.x - 1, sb.y, 0);
-        GL.Vertex3(sb.x - 1, sb.y * (-1), 0);
+        GL.Vertex3(8, sb.y, 0);
+        GL.Vertex3(8, sb.y * (-1), 0);
 
         GL.End();
         GL.PopMatrix();
@@ -347,7 +347,7 @@ public class SnakeGame : MonoBehaviour
 
         public bool checkCrashWithArena(Vector2 sb)
         {
-            if(blocks[0].posicaoX <= ((sb.x*(-1))+1) || blocks[0].posicaoX >= (sb.x-1) || blocks[0].posicaoY <= ((sb.y*(-1))) || blocks[0].posicaoY >= (sb.y-1)) return true;
+            if(blocks[0].posicaoX <= -9 || blocks[0].posicaoX >= 8 || blocks[0].posicaoY <= -5 || blocks[0].posicaoY >= 4) return true;
             return false;
         }
 
@@ -387,8 +387,8 @@ public class SnakeGame : MonoBehaviour
             {
                 valid = true;
 
-                randomBlock.posicaoX = rnd.Next(-12, 12);
-                randomBlock.posicaoY = rnd.Next(-5, 5);
+                randomBlock.posicaoX = rnd.Next(-8, 8);
+                randomBlock.posicaoY = rnd.Next(-4, 4);
 
                 for (int i = 0; i <= blocks.Count - 1; i++)
                 {
