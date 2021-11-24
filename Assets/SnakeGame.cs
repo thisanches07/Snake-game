@@ -14,9 +14,11 @@ public class SnakeGame : MonoBehaviour
     public Vector2 sb;
     public int numBlock = 2;
     public float velocidade = 0.1f;
+    public bool startGame = false;
+    bool createSnake = false;
     private float xAux = 0;
     private float yAux = 0;
-    private char direcao = 'D';
+    private char direcao = ' ';
     private bool free = false;
     private bool play = true;
     public bool crashArena= false;
@@ -30,7 +32,7 @@ public class SnakeGame : MonoBehaviour
     public void Start()
     {
         
-        snake = new Snake();
+        
         ts.text = snake.score.ToString();
         ts2.text = snake.score.ToString();
         sb = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
@@ -159,6 +161,7 @@ public class SnakeGame : MonoBehaviour
 
     private IEnumerator GameOverSequence()
     {
+        startGame = false;
         pnl_GameOver.SetActive(true);
 
         pnl_Score.SetActive(false);
@@ -176,13 +179,23 @@ public class SnakeGame : MonoBehaviour
 
     private void OnPostRender()
     {
-        BarTop();
-        BarBottom();
-        BarLeft();
-        BarRight();
-        Body();
+        if (startGame)
+        {
+            if(createSnake)snake = new Snake();
+            BarTop();
+            BarBottom();
+            BarLeft();
+            BarRight();
+            createSnake = false;
+        }
+            Body();
     }
-
+    public void StartGame()
+    {
+        direcao = 'D';
+        startGame = true;
+        createSnake = true;
+    }
     void Body()
     {
         GL.PushMatrix();

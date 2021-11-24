@@ -977,7 +977,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 519420033}
         m_TargetAssemblyTypeName: SnakeGame, Assembly-CSharp
-        m_MethodName: Start
+        m_MethodName: StartGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1444,7 +1444,6 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
-  - component: {fileID: 519420030}
   - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
@@ -1461,26 +1460,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
---- !u!114 &519420030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 519420028}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2ab8ff23a35a8f4ca7b0d7796ba0269, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: d7bf05dfd19d2dd408c14f8247c6ee81, type: 2}
-  sb: {x: 0, y: 0}
-  mGR: 2
-  mGL: -2
-  life: 3
-  score: 0
-  tl: {fileID: 0}
-  ts: {fileID: 1290476917}
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1556,6 +1535,7 @@ MonoBehaviour:
   sb: {x: 0, y: 0}
   numBlock: 2
   velocidade: 0.1
+  startGame: 0
   crashArena: 0
   ts: {fileID: 1290476917}
   ts2: {fileID: 1089977605}
@@ -4113,10 +4093,10 @@ RectTransform:
   m_Father: {fileID: 251034665}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.0000076293945}
-  m_SizeDelta: {x: 808, y: 346}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2097316629
 MonoBehaviour:
